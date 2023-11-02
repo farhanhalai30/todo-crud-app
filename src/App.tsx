@@ -1,38 +1,83 @@
 import { useState } from "react";
-import reactLogo from "./assets/react.svg";
-import "./App.css";
+
+const user = "Farhan Halai";
+const initialTodoList = [
+  {
+    id: 1,
+    title: "Apply for job",
+    completed: false,
+  },
+  {
+    id: 2,
+    title: "Read one page of book",
+    completed: false,
+  },
+  {
+    id: 3,
+    title: "Walk for one hour",
+    completed: false,
+  },
+  {
+    id: 4,
+    title: "Read figma design concepts",
+    completed: false,
+  },
+];
 
 function App() {
-  const [count, setCount] = useState(0);
+  const [todoList, setTodoList] = useState(initialTodoList);
+
+  function completeTodo(todoId: number) {
+    const newTodoList = todoList.map((todo) =>
+      todo.id === todoId && !todo.completed
+        ? { ...todo, completed: true }
+        : todo,
+    );
+    setTodoList(newTodoList);
+  }
+
+  function addTodo() {
+    const newTodoTitle = prompt("Add your todo item here : ");
+    setTodoList([
+      ...todoList,
+      {
+        id: todoList.length + 1,
+        title: newTodoTitle,
+        completed: false,
+      },
+    ]);
+  }
+
+  function deleteTodo(todoId) {
+    setTodoList(todoList.filter((todo) => todo.id !== todoId));
+  }
 
   return (
-    <div className="App">
-      <div>
-        <a href="https://reactjs.org" target="_blank" rel="noreferrer">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-        <a href="https://vitejs.dev" target="_blank" rel="noreferrer">
-          <img src="/vite.svg" className="logo" alt="Vite logo" />
-        </a>
-      </div>
-      <h1>React + Vite</h1>
-      <h2>On CodeSandbox!</h2>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR.
-        </p>
+    <div>
+      <h3>Welcome back, {user}</h3>
 
-        <p>
-          Tip: you can use the inspector button next to address bar to click on
-          components in the preview and open the code in the editor!
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
+      <button onClick={addTodo}>New todo</button>
+      <h4>Your todos:</h4>
+      {todoList.length === 0 && <span>No todos found</span>}
+      <ol>
+        {todoList.map((todo) => (
+          <li key={todo.id} onClick={() => completeTodo(todo.id)}>
+            <span
+              style={todo.completed ? { textDecoration: "line-through" } : {}}
+            >
+              {todo.title}
+            </span>
+            <span
+              onClick={(event) => {
+                event.stopPropagation();
+                deleteTodo(todo.id);
+              }}
+            >
+              X
+            </span>
+          </li>
+        ))}
+      </ol>
     </div>
   );
 }
