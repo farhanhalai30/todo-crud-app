@@ -8,33 +8,19 @@ interface todo {
 
 /** Initial Data */
 const user: string = "Farhan Halai";
-const initialTodoList: Array<todo> = [
-  {
-    id: 1,
-    title: "Apply for job",
-    completed: false,
-  },
-  {
-    id: 2,
-    title: "Read one page of book",
-    completed: false,
-  },
-  {
-    id: 3,
-    title: "Walk for one hour",
-    completed: false,
-  },
-  {
-    id: 4,
-    title: "Read figma design concepts",
-    completed: false,
-  },
-];
 
 function App() {
+  const localTodoList = localStorage.getItem("todoList");
+  const initialTodoList: Array<todo> =
+    localTodoList !== null ? JSON.parse(localTodoList) : [];
+
   const [todoList, setTodoList] = useState(initialTodoList);
   const [editTodoIndex, setEditTodoIndex] = useState(-1);
   const [editTodoValue, setEditTodoValue] = useState("");
+
+  function updateCache(newTodoList: Array<todo>) {
+    localStorage.setItem("todoList", JSON.stringify(newTodoList));
+  }
 
   function completeTodo(todoId: number) {
     const newTodoList = todoList.map((todo) =>
@@ -43,20 +29,24 @@ function App() {
         : todo,
     );
     setTodoList(newTodoList);
+    updateCache(newTodoList);
   }
 
   function addTodo() {
     const newTodoTitle = prompt("Add your todo item here : ");
 
-    if (newTodoTitle != null)
-      setTodoList([
+    if (newTodoTitle != null) {
+      const newTodoList = [
         ...todoList,
         {
           id: todoList.length + 1,
           title: newTodoTitle,
           completed: false,
         },
-      ]);
+      ];
+      setTodoList(newTodoList);
+      updateCache(newTodoList);
+    }
   }
 
   function handleEditTodoClick({ id, title }: todo) {
@@ -65,7 +55,9 @@ function App() {
   }
 
   function deleteTodo(todoId: number) {
-    setTodoList(todoList.filter((todo) => todo.id !== todoId));
+    const newTodoList = todoList.filter((todo: todo) => todo.id !== todoId);
+    setTodoList(todoList.filter((todo: todo) => todo.id !== todoId));
+    updateCache(newTodoList);
   }
 
   function handleTodoChange(e: ChangeEvent<HTMLInputElement>) {
@@ -77,13 +69,14 @@ function App() {
       setEditTodoIndex(-1);
       return;
     }
-    const newTodoList = todoList.map((todo) =>
+    const newTodoList = todoList.map((todo: todo) =>
       todo.id === todoId && !todo.completed
         ? { ...todo, title: editTodoValue }
         : todo,
     );
     setEditTodoIndex(-1);
     setTodoList(newTodoList);
+    updateCache(newTodoList);
   }
 
   return (
