@@ -26,6 +26,8 @@ const initialTodoList = [
 
 function App() {
   const [todoList, setTodoList] = useState(initialTodoList);
+  const [editTodoIndex, setEditTodoIndex] = useState(-1);
+  const [editTodoValue, setEditTodoValue] = useState("");
 
   function completeTodo(todoId: number) {
     const newTodoList = todoList.map((todo) =>
@@ -48,8 +50,31 @@ function App() {
     ]);
   }
 
-  function deleteTodo(todoId) {
+  function handleEditTodoClick({ id, title }) {
+    setEditTodoIndex(id);
+    setEditTodoValue(title);
+  }
+
+  function deleteTodo(todoId: number) {
     setTodoList(todoList.filter((todo) => todo.id !== todoId));
+  }
+
+  function handleTodoChange(e: any) {
+    setEditTodoValue(e.target.value);
+  }
+
+  function updateTodo(todoId) {
+    if (editTodoValue.trim() === "") {
+      setEditTodoIndex(-1);
+      return;
+    }
+    const newTodoList = todoList.map((todo) =>
+      todo.id === todoId && !todo.completed
+        ? { ...todo, title: editTodoValue }
+        : todo,
+    );
+    setEditTodoIndex(-1);
+    setTodoList(newTodoList);
   }
 
   return (
@@ -61,19 +86,33 @@ function App() {
       {todoList.length === 0 && <span>No todos found</span>}
       <ol>
         {todoList.map((todo) => (
-          <li key={todo.id} onClick={() => completeTodo(todo.id)}>
+          <li key={todo.id}>
+            {!todo.completed && editTodoIndex === todo.id ? (
+              <input
+                type="text"
+                value={editTodoValue}
+                onChange={handleTodoChange}
+                onBlur={() => updateTodo(todo.id)}
+              />
+            ) : (
+              <span
+                onClick={() => completeTodo(todo.id)}
+                style={todo.completed ? { textDecoration: "line-through" } : {}}
+              >
+                {todo.title}
+              </span>
+            )}
             <span
-              style={todo.completed ? { textDecoration: "line-through" } : {}}
+              onClick={() => handleEditTodoClick(todo)}
+              style={{ marginLeft: "10px" }}
             >
-              {todo.title}
+              E
             </span>
             <span
-              onClick={(event) => {
-                event.stopPropagation();
-                deleteTodo(todo.id);
-              }}
+              onClick={() => deleteTodo(todo.id)}
+              style={{ marginLeft: "10px" }}
             >
-              X
+              D
             </span>
           </li>
         ))}
