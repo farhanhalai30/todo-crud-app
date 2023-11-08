@@ -1,7 +1,14 @@
-import { useState } from "react";
+import { ChangeEvent, useState } from "react";
 
-const user = "Farhan Halai";
-const initialTodoList = [
+interface todo {
+  id: number;
+  title: string;
+  completed: boolean;
+}
+
+/** Initial Data */
+const user: string = "Farhan Halai";
+const initialTodoList: Array<todo> = [
   {
     id: 1,
     title: "Apply for job",
@@ -40,17 +47,19 @@ function App() {
 
   function addTodo() {
     const newTodoTitle = prompt("Add your todo item here : ");
-    setTodoList([
-      ...todoList,
-      {
-        id: todoList.length + 1,
-        title: newTodoTitle,
-        completed: false,
-      },
-    ]);
+
+    if (newTodoTitle != null)
+      setTodoList([
+        ...todoList,
+        {
+          id: todoList.length + 1,
+          title: newTodoTitle,
+          completed: false,
+        },
+      ]);
   }
 
-  function handleEditTodoClick({ id, title }) {
+  function handleEditTodoClick({ id, title }: todo) {
     setEditTodoIndex(id);
     setEditTodoValue(title);
   }
@@ -59,11 +68,11 @@ function App() {
     setTodoList(todoList.filter((todo) => todo.id !== todoId));
   }
 
-  function handleTodoChange(e: any) {
+  function handleTodoChange(e: ChangeEvent<HTMLInputElement>) {
     setEditTodoValue(e.target.value);
   }
 
-  function updateTodo(todoId) {
+  function updateTodo(todoId: number) {
     if (editTodoValue.trim() === "") {
       setEditTodoIndex(-1);
       return;
